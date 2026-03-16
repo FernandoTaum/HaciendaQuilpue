@@ -103,6 +103,24 @@ h4,
     padding: 24px 0;
 }
 
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.nav-logos {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-logo-img {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+}
+
 .nav-titles {
     display: flex;
     flex-direction: column;
@@ -737,5 +755,13 @@ h4,
 
     .nav-subtitle {
         font-size: 0.65rem;
+    }
+
+    .nav-logo-img {
+        height: 30px;
+    }
+
+    .nav-brand {
+        gap: 10px;
     }
 }
