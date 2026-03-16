@@ -6,11 +6,18 @@ const revealObserver = new IntersectionObserver((entries) => {
         }
     });
 }, {
-    threshold: 0.1,
+    threshold: 0.05,
     rootMargin: '0px 0px -50px 0px'
 });
 
-document.querySelectorAll('[data-reveal]').forEach(el => revealObserver.observe(el));
+function initReveals() {
+    document.querySelectorAll('[data-reveal], .history-content > *, .epoch-item').forEach(el => {
+        if (!el.hasAttribute('data-reveal')) el.setAttribute('data-reveal', '');
+        revealObserver.observe(el);
+    });
+}
+
+initReveals();
 
 // ===== Reading Progress Bar =====
 const readingProgress = document.getElementById('readingProgress');
@@ -22,44 +29,50 @@ window.addEventListener('scroll', () => {
     readingProgress.style.width = `${progress}%`;
 });
 
-// ===== Smooth Navbar Interaction =====
-const header = document.querySelector('.header');
+// ===== Hero Parallax Flow =====
 window.addEventListener('scroll', () => {
-    if (window.scrollY > 100) {
-        header.style.padding = '10px 0';
-        header.style.boxShadow = '0 10px 30px rgba(0,0,0,0.08)';
-    } else {
-        header.style.padding = '20px 0';
-        header.style.boxShadow = 'none';
+    const hero = document.querySelector('.hero');
+    if (hero) {
+        const scroll = window.scrollY;
+        hero.style.backgroundPositionY = `${scroll * 0.5}px`;
     }
 });
 
-// ===== Navigation Highlighting =====
-const sections = document.querySelectorAll('section[id]');
-const navLinks = document.querySelectorAll('.nav-link');
+// ===== Smooth Navbar Interaction =====
+const header = document.querySelector('.header');
+window.addEventListener('scroll', () => {
+    if (window.scrollY > 80) {
+        header.style.padding = '8px 0';
+        header.classList.add('scrolled');
+    } else {
+        header.style.padding = '16px 0';
+        header.classList.remove('scrolled');
+    }
+});
 
-function highlightNav() {
-    let scrollY = window.pageYOffset;
+// ===== Navigation Highlighting Optimization =====
+const sectionElements = document.querySelectorAll('section[id]');
+const navLinkElements = document.querySelectorAll('.nav-link');
 
-    sections.forEach(current => {
-        const sectionHeight = current.offsetHeight;
-        const sectionTop = current.offsetTop - 150;
-        const sectionId = current.getAttribute('id');
-
-        if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
-            navLinks.forEach(link => {
+const navObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            navLinkElements.forEach(link => {
                 link.classList.remove('active');
-                if (link.getAttribute('href') === `#${sectionId}`) {
+                if (link.getAttribute('href') === `#${entry.target.id}`) {
                     link.classList.add('active');
                 }
             });
         }
     });
-}
+}, {
+    threshold: 0.3,
+    rootMargin: '-20% 0px -20% 0px'
+});
 
-window.addEventListener('scroll', highlightNav);
+sectionElements.forEach(section => navObserver.observe(section));
 
-// ===== Mobile Menu =====
+// ===== Mobile Menu (Enhanced) =====
 const navToggle = document.getElementById('navToggle');
 const navMenu = document.getElementById('navMenu');
 
@@ -67,19 +80,28 @@ if (navToggle) {
     navToggle.addEventListener('click', () => {
         navMenu.classList.toggle('active');
         navToggle.classList.toggle('open');
+        document.body.style.overflow = navMenu.classList.contains('active') ? 'hidden' : '';
     });
 }
+
+// Close mobile menu on link click
+navLinkElements.forEach(link => {
+    link.addEventListener('click', () => {
+        navMenu.classList.remove('active');
+        navToggle.classList.remove('open');
+        document.body.style.overflow = '';
+    });
+});
 
 // ===== Lightbox Optimization =====
 const lightbox = document.getElementById('lightbox');
 const lightboxImg = document.getElementById('lightboxImage');
 const lightboxCaption = document.getElementById('lightboxCaption');
-const galleryItems = document.querySelectorAll('.gallery-item');
 
-galleryItems.forEach(item => {
+document.querySelectorAll('.gallery-item, .epoch-item').forEach(item => {
     item.addEventListener('click', () => {
         const img = item.querySelector('img');
-        const caption = item.querySelector('.gallery-overlay span').textContent;
+        const caption = item.querySelector('.gallery-overlay span, .epoch-caption')?.textContent || '';
 
         lightboxImg.src = img.src;
         lightboxCaption.textContent = caption;
