@@ -191,7 +191,7 @@ h4,
     content: '';
     position: absolute;
     inset: 0;
-    background: url('Imagenes/WhatsApp Image 2026-03-06 at 10.18.23 PM.jpeg') center/cover no-repeat;
+    background: url('WhatsApp Image 2026-03-06 at 10.18.23 PM.jpeg') center/cover no-repeat;
     opacity: 0.5;
     animation: cinemagraph 30s linear infinite alternate;
 }
